@@ -2,7 +2,7 @@
 #define TERMINAL_H
 
 #include <stdint.h>
-#include "card.h"
+#include "../Card/card.h"
 
 typedef struct ST_terminalData_t
 {
@@ -26,6 +26,6 @@ EN_terminalError_t setMaxAmount(ST_terminalData_t* termData);
 
 char* EN_teminalERROR_to_STR(EN_terminalError_t err);
 
-void terminal(ST_terminalData_t* termData, EN_terminalError_t terminalError, ST_cardData_t* cardData);
+void terminal(ST_terminalData_t* termData, EN_terminalError_t* terminalError, ST_cardData_t* cardData);
 
 #endif

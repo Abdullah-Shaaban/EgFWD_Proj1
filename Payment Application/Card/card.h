@@ -23,6 +23,8 @@ EN_cardError_t getCardPAN(ST_cardData_t* cardData);
 
 char* EN_cardERROR_to_STR(EN_cardError_t err);
 
-void card(ST_cardData_t* cardData, EN_cardError_t cardError);
+void card(ST_cardData_t* cardData, EN_cardError_t* cardError);
+
+void flush_input_stream();
 
 #endif

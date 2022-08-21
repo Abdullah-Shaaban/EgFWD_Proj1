@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "terminal.h"
-#include "card.h"
+#include "../Terminal/terminal.h"
+#include "../Card/card.h"
 
 //---------
 #define MAX_AMOUNT 50000
@@ -34,12 +34,6 @@ EN_terminalError_t getTransactionDate(ST_terminalData_t* termData)
 	//Get input from user
 	printf("\nPLease, enter the transaction date: ");
 	fgets((char*)termData->transactionDate, 11, stdin);
-	//**************
-	//Flushing the input stream because it causes the next fgets to read only '\n' for some reason!!
-	//fflush(stdin);
-	char c;
-	while ((c = getchar()) != '\n' && c != EOF){}
-	//**************
 	//Checking if the user input is correct: If the transaction date is NULL, less than 10 characters or wrong format will return WRONG_DATE error
 	int char_count = 0;
 	EN_InputFormat format = CORRECT_FORMAT;
@@ -58,6 +52,10 @@ EN_terminalError_t getTransactionDate(ST_terminalData_t* termData)
 	if (char_count == 10 && format == CORRECT_FORMAT)
 	{
 		return OK_T;
+		//**************
+		//Flushing the input stream because it causes the next fgets to read only '\n' for some reason!!
+		flush_input_stream();
+		//**************
 	}
 	else
 	{
@@ -135,20 +133,21 @@ EN_terminalError_t isValidCardPAN(ST_cardData_t* cardData)
 };
 
 
-void terminal(ST_terminalData_t* termData , EN_terminalError_t terminalError, ST_cardData_t* cardData)
+void terminal(ST_terminalData_t* termData , EN_terminalError_t* terminalError, ST_cardData_t* cardData)
 {
-	terminalError = getTransactionDate(termData);
-	printf("\nChecking the entered Transaction Date Format...\t%s", EN_teminalERROR_to_STR(terminalError));
+	*terminalError = getTransactionDate(termData);
+	printf("\nChecking the entered Transaction Date Format...\t%s", EN_teminalERROR_to_STR(*terminalError));
 	//----
-	terminalError = isCardExpired(*cardData, *termData);
-	printf("\nComparing Expiry Date and Transaction Date...\t%s", EN_teminalERROR_to_STR(terminalError));
+	*terminalError = isCardExpired(*cardData, *termData);
+	printf("\nChecking if the card is expired...\t%s", EN_teminalERROR_to_STR(*terminalError));
+	if (*terminalError != OK_T) { return; };
 	//----
-	terminalError = getTransactionAmount(termData);
-	printf("\nChecking the entered Transaction Amount Format...\t%s", EN_teminalERROR_to_STR(terminalError));
+	*terminalError = getTransactionAmount(termData);
+	printf("\nChecking the entered Transaction Amount Format...\t%s", EN_teminalERROR_to_STR(*terminalError));
 	//----
-	terminalError = setMaxAmount(termData);
-	printf("\nSetting the Max Amount to %u...\t%s", MAX_AMOUNT, EN_teminalERROR_to_STR(terminalError));
+	*terminalError = setMaxAmount(termData);
+	printf("\nThe Max Transaction Amount is %u...\t%s", MAX_AMOUNT, EN_teminalERROR_to_STR(*terminalError));
 	//----
-	terminalError = isBelowMaxAmount(termData);
-	printf("\nChecking if the entered amount is Below Max Amount...\t%s", EN_teminalERROR_to_STR(terminalError));
+	*terminalError = isBelowMaxAmount(termData);
+	printf("\nChecking if the entered amount is Below Max Amount...\t%s", EN_teminalERROR_to_STR(*terminalError));
 };

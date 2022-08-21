@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include "card.h"
 
+void flush_input_stream()
+{
+	//fflush(stdin);
+	char c;
+	while ((c = getchar()) != '\n' && c != EOF) {}
+};
+
 char* EN_cardERROR_to_STR(EN_cardError_t err)
 {
 	switch (err)
@@ -22,7 +29,7 @@ EN_cardError_t getCardHolderName(ST_cardData_t* cardData)
 	//Get input from user
 	printf("\nPLease, enter cardholder's name: ");
 	fgets((char*)cardData->cardHolderName, 25, stdin);
-	//Checking if the user input is correct
+	//Checking if the input Format is correct
 	int char_count = 0;
 	for (int i = 0; i < sizeof(cardData->cardHolderName) / sizeof(uint8_t); i++)
 	{
@@ -32,6 +39,8 @@ EN_cardError_t getCardHolderName(ST_cardData_t* cardData)
 	if (char_count>=20 && char_count<=24) 
 	{
 		return OK;
+		if(char_count==24)
+			flush_input_stream();
 	}
 	else 
 	{
@@ -52,9 +61,7 @@ EN_cardError_t getCardExpiryDate(ST_cardData_t* cardData)
 	fgets((char*)cardData->cardExpirationDate, 6, stdin);
 	//**************
 	//Flushing the input stream because it causes the next fgets to read only '\n' for some reason!!
-	//fflush(stdin);
-	char c;
-	while ((c = getchar()) != '\n' && c != EOF){}
+	flush_input_stream();
 	//**************
 	//Checking if the user input is correct
 	//How to check "correct format??"
@@ -113,6 +120,8 @@ EN_cardError_t getCardPAN(ST_cardData_t* cardData)
 	if (char_count >= 16 && char_count <= 19 && format==CORRECT_FORMAT)
 	{
 		return OK;
+		if(char_count==19)
+			flush_input_stream();
 	}
 	else
 	{
@@ -120,16 +129,16 @@ EN_cardError_t getCardPAN(ST_cardData_t* cardData)
 	}
 };
 
-void card(ST_cardData_t* cardData , EN_cardError_t cardError)
+void card(ST_cardData_t* cardData , EN_cardError_t* cardError)
 {
 	//----
-	cardError = getCardHolderName(cardData);
-	printf("\nChecking the entered name Format...\t%s", EN_cardERROR_to_STR(cardError));
+	*cardError = getCardHolderName(cardData);
+	printf("\nChecking the entered name Format...\t%s", EN_cardERROR_to_STR(*cardError));
 	//----
-	cardError = getCardPAN(cardData);
-	printf("\nChecking the entered Primary Account Number Format...\t%s", EN_cardERROR_to_STR(cardError));
+	*cardError = getCardPAN(cardData);
+	printf("\nChecking the entered Primary Account Number Format...\t%s", EN_cardERROR_to_STR(*cardError));
 	//----
-	cardError = getCardExpiryDate(cardData);
-	printf("\nChecking the entered Card Expiry Date Format...\t%s", EN_cardERROR_to_STR(cardError));
+	*cardError = getCardExpiryDate(cardData);
+	printf("\nChecking the entered Card Expiry Date Format...\t%s", EN_cardERROR_to_STR(*cardError));
 	//----
 };
