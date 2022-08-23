@@ -81,13 +81,13 @@ EN_serverError_t isAmountAvailable(ST_terminalData_t* termData)
 
 EN_serverError_t saveTransaction(ST_transaction_t* transData)
 {
-    //2. It gives a sequence number to a transaction, this number is incremented once a transaction is processed into the server.
-    transData->transactionSequenceNumber = current_TransDB_index;
     //4. If transaction can't be saved will return SAVING_FAILED, else will return OK
     if (current_TransDB_index == 256)
         return SAVING_FAILED;
     else
     {
+        //2. It gives a sequence number to a transaction, this number is incremented once a transaction is processed into the server.
+        transData->transactionSequenceNumber = current_TransDB_index;
         //3. It saves any type of transaction, APPROVED or DECLINED, with the specific reason for declining/transaction state.
         //Directly copying the structs as shown below is allowed because the members are arrays, not pointers!!
         transactions_DB[current_TransDB_index].transactionSequenceNumber = transData->transactionSequenceNumber;
@@ -171,18 +171,12 @@ EN_transState_t  recieveTransactionData(ST_transaction_t* transData)
         else
         {
             //It will update the database with the new balance.
-            for (int i = 0; i < 255; i++) {
-                if (!strcmp(transData->cardHolderData.primaryAccountNumber, accounts_DB[i].primaryAccountNumber))
-                {
-                    accounts_DB[i].balance = accounts_DB[i].balance - transData->terminalData.transAmount;
-                    //---------
-                    #ifdef DEBUG
-                        printf("\nAfter Deduction: accounts_DB[%u].balance= %f -- Associated PAN= %s", i,accounts_DB[i].balance, accounts_DB[i].primaryAccountNumber);
-                    #endif // DEBUG
-                    //---------
-                    break;
-                }
-            }
+            accounts_DB[current_AccountDB_index].balance = accounts_DB[current_AccountDB_index].balance - transData->terminalData.transAmount;
+            //---------
+            #ifdef DEBUG
+                printf("\nAfter Deduction: accounts_DB[%u].balance= %f -- Associated PAN= %s", i,accounts_DB[i].balance, accounts_DB[i].primaryAccountNumber);
+            #endif // DEBUG
+            //---------
         }
     }
     else
@@ -191,10 +185,11 @@ EN_transState_t  recieveTransactionData(ST_transaction_t* transData)
     }
     serverERROR = saveTransaction(transData);
     printf("\nSaving the transaction in the server database...\t%s", EN_serverERROR_to_STR(serverERROR));
-    if (serverERROR != OK_S)
+    if (serverERROR != OK_S && transData->transState==OK_S)
+    {
         transData->transState = INTERNAL_SERVER_ERROR;
-    
-    //return DECLINED_STOLEN_CARD, DECLINED_INSUFFECIENT_FUND, INTERNAL_SERVER_ERROR, or APPROVED.
+    }
+    //return the state, which may be DECLINED_STOLEN_CARD, DECLINED_INSUFFECIENT_FUND, INTERNAL_SERVER_ERROR, or APPROVED.
     return transData->transState;
 };
 

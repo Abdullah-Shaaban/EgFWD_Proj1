@@ -53,6 +53,7 @@ int main()
 		//Flushing the input stream because it causes the next fgets to read only '\n' for some reason!!
 		flush_input_stream();
 		//**************
+		printf("\n***************************************************************************************\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 	} while (flag != FINISH);
 	return 0;
 }

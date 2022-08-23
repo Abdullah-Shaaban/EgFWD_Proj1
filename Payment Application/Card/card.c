@@ -38,9 +38,9 @@ EN_cardError_t getCardHolderName(ST_cardData_t* cardData)
 	}
 	if (char_count>=20 && char_count<=24) 
 	{
-		return OK;
-		if(char_count==24)
+		if (char_count == 24)
 			flush_input_stream();
+		return OK;
 	}
 	else 
 	{
@@ -59,12 +59,7 @@ EN_cardError_t getCardExpiryDate(ST_cardData_t* cardData)
 	//Get input from user
 	printf("\nPLease, enter the card expiry date: ");
 	fgets((char*)cardData->cardExpirationDate, 6, stdin);
-	//**************
-	//Flushing the input stream because it causes the next fgets to read only '\n' for some reason!!
-	flush_input_stream();
-	//**************
-	//Checking if the user input is correct
-	//How to check "correct format??"
+	//Checking if the input Format is correct
 	int char_count	= 0;
 	EN_InputFormat format = CORRECT_FORMAT;
 	for (int i = 0; i < sizeof(cardData->cardExpirationDate) / sizeof(uint8_t); i++)
@@ -81,6 +76,10 @@ EN_cardError_t getCardExpiryDate(ST_cardData_t* cardData)
 	}
 	if (char_count == 5 && format==CORRECT_FORMAT)
 	{
+		//**************
+		//Flushing the input stream because it causes the next fgets to read only '\n' for some reason!!
+		flush_input_stream();
+		//**************
 		return OK;
 	}
 	else
@@ -108,7 +107,7 @@ EN_cardError_t getCardPAN(ST_cardData_t* cardData)
 		if (cardData->primaryAccountNumber[i] != '\0' && cardData->primaryAccountNumber[i] != '\n')
 		{
 			char_count++;
-			//Allowing Alphanumics only
+			//Allowing Alphanumerics only
 			if ( !(cardData->primaryAccountNumber[i] > 48 || cardData->primaryAccountNumber[i] < 57) &&
 				 !(cardData->primaryAccountNumber[i] > 65 || cardData->primaryAccountNumber[i] < 90) &&
 				 !(cardData->primaryAccountNumber[i] > 97 || cardData->primaryAccountNumber[i] < 122))
@@ -119,9 +118,9 @@ EN_cardError_t getCardPAN(ST_cardData_t* cardData)
 	}
 	if (char_count >= 16 && char_count <= 19 && format==CORRECT_FORMAT)
 	{
-		return OK;
-		if(char_count==19)
+		if (char_count == 19)
 			flush_input_stream();
+		return OK;
 	}
 	else
 	{

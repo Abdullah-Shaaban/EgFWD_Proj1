@@ -51,11 +51,11 @@ EN_terminalError_t getTransactionDate(ST_terminalData_t* termData)
 	}
 	if (char_count == 10 && format == CORRECT_FORMAT)
 	{
-		return OK_T;
 		//**************
 		//Flushing the input stream because it causes the next fgets to read only '\n' for some reason!!
 		flush_input_stream();
 		//**************
+		return OK_T;
 	}
 	else
 	{
