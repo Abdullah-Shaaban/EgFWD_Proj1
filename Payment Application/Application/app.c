@@ -36,6 +36,11 @@ void appStart(void)
 	ST_transaction_t* transData		= NULL;
 	transData = malloc(1 * sizeof(ST_transaction_t));
 	server(transData, cardData, termData);
+	
+	// Free allocated memory
+	free(cardData);
+	free(termData);
+	free(transData);
 };
 
 int main()
